@@ -14,4 +14,5 @@ new CreateUiTool().register(server);
 new LogoSearchTool().register(server);
 
 const transport = new StdioServerTransport();
+// @ts-ignore
 await server.connect(transport);

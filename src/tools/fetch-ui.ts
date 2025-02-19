@@ -7,6 +7,11 @@ const FETCH_UI_TOOL_DESCRIPTION = `
 After calling this tool, you must edit or add files to integrate the snippet into the codebase."
 `;
 
+interface Component {
+  icon: string;
+  code: string;
+}
+
 export class FetchUiTool extends BaseTool {
   name = FETCH_UI_TOOL_NAME;
   description = FETCH_UI_TOOL_DESCRIPTION;
@@ -21,7 +26,7 @@ export class FetchUiTool extends BaseTool {
 
   async execute({ searchQuery }: z.infer<typeof this.schema>) {
     try {
-      const components = [];
+      const components: Component[] = [];
 
       return {
         content: [

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import fs from "fs/promises";
+import { promises as fs } from "fs";
 import { BaseTool } from "@/utils/base-tool";
 
 // Types for SVGL API responses
