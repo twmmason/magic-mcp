@@ -1,9 +1,10 @@
 {
   "name": "21stdev/magic-mcp",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && tsc-alias"
+    "start": "node dist/index.js",
+    "build": "tsc"
   },
   "author": "sergeibynas@gmail.com",
   "license": "ISC",
@@ -12,7 +13,6 @@
     "@modelcontextprotocol/sdk": "^1.5.0",
     "@types/axios": "^0.9.36",
     "axios": "^1.7.9",
-    "tsc-alias": "^1.8.10",
     "typescript": "^5.7.3",
     "zod": "^3.24.2"
   },

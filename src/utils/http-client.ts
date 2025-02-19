@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const TWENTY_FIRST_API_KEY = process.env.TWENTY_FIRST_API_KEY;
+const TWENTY_FIRST_API_KEY = process.env.TWENTY_FIRST_API_KEY || "test";
 
 if (!TWENTY_FIRST_API_KEY) {
   throw new Error("TWENTY_FIRST_API_KEY environment variable is not set");

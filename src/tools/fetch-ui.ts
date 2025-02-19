@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BaseTool } from "@/utils/base-tool";
+import { BaseTool } from "../utils/base-tool";
 
 const FETCH_UI_TOOL_NAME = "21st_magic_component_inspiration";
 const FETCH_UI_TOOL_DESCRIPTION = `

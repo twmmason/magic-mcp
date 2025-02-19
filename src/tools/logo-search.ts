@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { promises as fs } from "fs";
-import { BaseTool } from "@/utils/base-tool";
+import { BaseTool } from "../utils/base-tool";
 
 // Types for SVGL API responses
 interface ThemeOptions {
