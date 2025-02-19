@@ -1,6 +1,6 @@
 import { z } from "zod";
-
 import { BaseTool } from "@/utils/base-tool";
+import { twentyFirstClient } from "@/utils/http-client";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -8,6 +8,10 @@ const UI_TOOL_DESCRIPTION = `
 This tool ONLY returns the text snippet for that UI component. 
 After calling this tool, you must edit or add files to integrate the snippet into the codebase."
 `;
+
+interface CreateUiResponse {
+  text: string;
+}
 
 export class CreateUiTool extends BaseTool {
   name = UI_TOOL_NAME;
@@ -24,15 +28,19 @@ export class CreateUiTool extends BaseTool {
 
   async execute({ message, searchQuery }: z.infer<typeof this.schema>) {
     try {
-      const output = {
-        text: "Hello, world!",
-      };
+      const { data } = await twentyFirstClient.post<CreateUiResponse>(
+        "/api/create-ui",
+        {
+          message,
+          searchQuery,
+        }
+      );
 
       return {
         content: [
           {
             type: "text" as const,
-            text: output.text,
+            text: data.text,
           },
         ],
       };

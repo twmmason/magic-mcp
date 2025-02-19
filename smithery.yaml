@@ -5,9 +5,13 @@ startCommand:
   configSchema:
     # JSON Schema defining the configuration options for the MCP.
     type: object
-    required: []
-    properties: {}
+    required: 
+      - TWENTY_FIRST_API_KEY
+    properties:
+      TWENTY_FIRST_API_KEY:
+        type: string
+        description: "The API key for the 21st.dev/magic"
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
-    (config) => ({ command: 'node', args: ['dist/index.js'], env: {} })
+    (config) => ({ command: 'node', args: ['dist/index.js'], env: { TWENTY_FIRST_API_KEY: config.TWENTY_FIRST_API_KEY } })
