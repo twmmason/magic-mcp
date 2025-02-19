@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Build TypeScript
-RUN pnpm build
+RUN npm run build
 
 # Command will be provided by smithery.yaml
 CMD ["node", "dist/index.js"] 
