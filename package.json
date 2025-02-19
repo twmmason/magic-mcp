@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc && tsc-alias"
   },
   "author": "sergeibynas@gmail.com",
   "license": "ISC",
   "description": "Magic MCP",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.5.0"
+    "@modelcontextprotocol/sdk": "^1.5.0",
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.7.3",
+    "zod": "^3.24.2"
   }
 }
