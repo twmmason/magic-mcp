@@ -10,7 +10,7 @@ startCommand:
     properties:
       TWENTY_FIRST_API_KEY:
         type: string
-        description: "The API key for the 21st.dev/magic"
+        description: "The API key from https://21st.dev/magic/console"
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
