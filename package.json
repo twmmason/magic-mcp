@@ -6,7 +6,7 @@
     "start": "node dist/index.js",
     "build": "tsc"
   },
-  "author": "sergeibynas@gmail.com",
+  "author": "serafim@21st.dev",
   "license": "ISC",
   "description": "Magic MCP",
   "dependencies": {
