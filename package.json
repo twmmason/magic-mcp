@@ -1,6 +1,6 @@
 {
   "name": "@21st-dev/magic",
-  "version": "0.0.9",
+  "version": "0.0.16",
   "type": "module",
   "description": "Magic MCP UI builder by 21st.dev",
   "homepage": "https://21st.dev/magic",
@@ -36,14 +36,13 @@
   "license": "ISC",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.5.0",
-    "axios": "^1.7.9",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
-    "typescript": "^5.7.3",
     "@types/node": "^22.13.4",
-    "shx": "^0.3.4"
+    "shx": "^0.3.4",
+    "typescript": "^5.7.3"
   },
   "engines": {
     "node": ">=18.0.0"
