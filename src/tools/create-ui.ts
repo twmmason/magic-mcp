@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
+import { readdir } from "fs/promises";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -24,9 +25,16 @@ export class CreateUiTool extends BaseTool {
       .describe(
         "Generate a search query for 21st.dev (library for searching UI components) to find a UI component that matches the user's message. Must be a two-four words max or phrase"
       ),
+    absolutePathToProjectDirectory: z
+      .string()
+      .describe("Absolute path to the project root directory"),
   });
 
-  async execute({ message, searchQuery }: z.infer<typeof this.schema>) {
+  async execute({
+    message,
+    searchQuery,
+    absolutePathToProjectDirectory,
+  }: z.infer<typeof this.schema>) {
     try {
       const { data } = await twentyFirstClient.post<CreateUiResponse>(
         "/api/create-ui",
@@ -36,11 +44,18 @@ export class CreateUiTool extends BaseTool {
         }
       );
 
+      const currentDirFiles = await readdir(absolutePathToProjectDirectory, {
+        withFileTypes: true,
+      });
+
       return {
         content: [
           {
             type: "text" as const,
-            text: data.text,
+            text: JSON.stringify({
+              dirFiles: currentDirFiles,
+              component: data.text,
+            }),
           },
         ],
       };
