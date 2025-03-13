@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
-import { readdir } from "fs/promises";
+import { readdir, readFile } from "fs/promises";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -25,6 +25,11 @@ export class CreateUiTool extends BaseTool {
       .describe(
         "Generate a search query for 21st.dev (library for searching UI components) to find a UI component that matches the user's message. Must be a two-four words max or phrase"
       ),
+    absolutePathToCurrentFile: z
+      .string()
+      .describe(
+        "Absolute path to the current file to which we want to apply changes"
+      ),
     absolutePathToProjectDirectory: z
       .string()
       .describe("Absolute path to the project root directory"),
@@ -34,6 +39,7 @@ export class CreateUiTool extends BaseTool {
     message,
     searchQuery,
     absolutePathToProjectDirectory,
+    absolutePathToCurrentFile,
   }: z.infer<typeof this.schema>) {
     try {
       const { data } = await twentyFirstClient.post<CreateUiResponse>(
@@ -48,13 +54,19 @@ export class CreateUiTool extends BaseTool {
         withFileTypes: true,
       });
 
+      const currentFileContent = await readFile(
+        absolutePathToCurrentFile,
+        "utf-8"
+      );
+
       return {
         content: [
           {
             type: "text" as const,
             text: JSON.stringify({
               dirFiles: currentDirFiles,
-              component: data.text,
+              currentFileContent,
+              component: data.text + "\n\n" + data.,
             }),
           },
         ],
