@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
-import { readdir, readFile } from "fs/promises";
+import { callbackServer } from "../utils/callback-server.js";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -42,32 +42,38 @@ export class CreateUiTool extends BaseTool {
     absolutePathToCurrentFile,
   }: z.infer<typeof this.schema>) {
     try {
-      const { data } = await twentyFirstClient.post<CreateUiResponse>(
-        "/api/create-ui",
-        {
+      const responses = await Promise.all([
+        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
           message,
           searchQuery,
-        }
-      );
+        }),
+        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
+          message,
+          searchQuery,
+        }),
+        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
+          message,
+          searchQuery,
+        }),
+      ]);
 
-      const currentDirFiles = await readdir(absolutePathToProjectDirectory, {
-        withFileTypes: true,
+      const { data } = await callbackServer.promptUser({
+        initialData: {
+          data1: responses[0],
+          data2: responses[1],
+          data3: responses[2],
+        },
       });
 
-      const currentFileContent = await readFile(
-        absolutePathToCurrentFile,
-        "utf-8"
-      );
+      const componentData = data || {
+        text: "No component data received. Please try again.",
+      };
 
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify({
-              dirFiles: currentDirFiles,
-              currentFileContent,
-              component: data.text + "\n\n" + data.,
-            }),
+            text: JSON.stringify(componentData, null, 2),
           },
         ],
       };
