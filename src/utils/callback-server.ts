@@ -4,6 +4,7 @@ import { AddressInfo } from "net";
 import open from "open";
 import path from "path";
 import { fileURLToPath } from "url";
+import net from "net";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,102 +15,129 @@ export interface CallbackResponse {
 
 export interface CallbackServerConfig {
   initialData?: any;
+  timeout?: number;
 }
 
-class CallbackServer {
-  private static instance: CallbackServer;
+export class CallbackServer {
   private server: Server | null = null;
-  private app: express.Express;
+  private app = express();
   private port: number;
-  private previewerPath: string;
-  private responseHandlers: Map<
-    string,
-    { resolve: (data: CallbackResponse) => void; initialData?: any }
-  > = new Map();
+  private sessionId = Math.random().toString(36).substring(7);
+  private timeoutId?: NodeJS.Timeout;
 
-  private constructor(port = 3333) {
+  constructor(port = 3333) {
     this.port = port;
-    this.app = express();
-    this.previewerPath = path.join(__dirname, "../../previewer");
-    this.setupServer();
+    this.setupRoutes();
   }
 
-  static getInstance(port?: number): CallbackServer {
-    if (!CallbackServer.instance) {
-      CallbackServer.instance = new CallbackServer(port);
-    }
-    return CallbackServer.instance;
-  }
+  private setupRoutes() {
+    const previewerPath = path.join(__dirname, "../previewer");
 
-  private setupServer() {
     this.app.use(express.json());
-    this.app.use(express.static(this.previewerPath));
-    // app.use(
-    //   cors({
-    //     origin: "*",
-    //     methods: ["GET", "POST", "OPTIONS"],
-    //     allowedHeaders: ["Content-Type"],
-    //   })
-    // );
+    this.app.use(express.static(previewerPath));
 
     this.app.get("/callback/:id", (req, res) => {
       const { id } = req.params;
-      const initialData = this.responseHandlers.get(id)?.initialData;
-      res.json({ status: "success", data: initialData });
+      if (id === this.sessionId) {
+        res.json({ status: "success", data: this.config?.initialData });
+      } else {
+        res.status(404).json({ status: "error", message: "Session not found" });
+      }
     });
 
     this.app.post("/callback/:id", (req, res) => {
       const { id } = req.params;
-      const handler = this.responseHandlers.get(id);
+      if (id === this.sessionId && this.promiseResolve) {
+        if (this.timeoutId) clearTimeout(this.timeoutId);
 
-      if (handler) {
-        const data = req.body || {};
-        handler.resolve({ data });
-        this.responseHandlers.delete(id);
+        this.promiseResolve({ data: req.body || {} });
+        this.shutdown();
       }
 
       res.json({ status: "success" });
     });
 
     this.app.get("*", (req, res) => {
-      res.sendFile(path.join(this.previewerPath, "index.html"));
+      res.sendFile(path.join(previewerPath, "index.html"));
     });
   }
 
-  async startServer(): Promise<void> {
-    if (!this.server) {
-      this.server = this.app.listen(this.port, "127.0.0.1", () => {
-        const address = this.server?.address() as AddressInfo;
-        const previewUrl = `http://127.0.0.1:${address.port}`;
-        console.log(`Preview server running at ${previewUrl}`);
-      });
-
-      this.server.on("error", (error: Error) => {
-        console.error("Server error:", error);
-      });
+  private async shutdown(): Promise<void> {
+    if (this.server) {
+      this.server.close();
+      this.server = null;
+    }
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
     }
   }
+
+  private isPortAvailable(port: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const tester = net
+        .createServer()
+        .once("error", () => resolve(false))
+        .once("listening", () => {
+          tester.close();
+          resolve(true);
+        })
+        .listen(port, "127.0.0.1");
+    });
+  }
+
+  private async findAvailablePort(): Promise<number> {
+    let port = this.port;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      if (await this.isPortAvailable(port)) {
+        return port;
+      }
+      port++;
+    }
+    throw new Error("Unable to find an available port after 100 attempts");
+  }
+
+  private config?: CallbackServerConfig;
+  private promiseResolve?: (value: CallbackResponse) => void;
+  private promiseReject?: (reason: any) => void;
 
   async promptUser(
     config: CallbackServerConfig = {}
   ): Promise<CallbackResponse> {
-    const { initialData = null } = config;
+    const { initialData = null, timeout = 300000 } = config;
+    this.config = config;
 
-    await this.startServer();
-    const id = Math.random().toString(36).substring(7);
+    try {
+      // Find available port and start server
+      const availablePort = await this.findAvailablePort();
+      this.server = this.app.listen(availablePort, "127.0.0.1");
 
-    return new Promise<CallbackResponse>(async (resolve) => {
-      this.responseHandlers.set(id, { resolve, initialData });
+      this.server.on("error", (error) => {
+        if (this.promiseReject) this.promiseReject(error);
+      });
 
-      if (!this.server) {
-        await this.startServer();
-      }
+      // Create and return promise
+      return new Promise<CallbackResponse>((resolve, reject) => {
+        this.promiseResolve = resolve;
+        this.promiseReject = reject;
 
-      const address = this.server!.address() as AddressInfo;
-      const previewUrl = `http://127.0.0.1:${address.port}?id=${id}`;
-      open(previewUrl);
-    });
+        // Set timeout
+        this.timeoutId = setTimeout(() => {
+          resolve({ data: { timedOut: true } });
+          this.shutdown();
+        }, timeout);
+
+        // Open browser
+        const address = this.server!.address() as AddressInfo;
+        const url = `http://127.0.0.1:${address.port}?id=${this.sessionId}`;
+
+        open(url).catch((error) => {
+          reject(error);
+          this.shutdown();
+        });
+      });
+    } catch (error) {
+      await this.shutdown();
+      throw error;
+    }
   }
 }
-
-export const callbackServer = CallbackServer.getInstance();

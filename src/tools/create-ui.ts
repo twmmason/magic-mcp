@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
-import { callbackServer } from "../utils/callback-server.js";
+import { CallbackServer } from "../utils/callback-server.js";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -57,11 +57,12 @@ export class CreateUiTool extends BaseTool {
         }),
       ]);
 
-      const { data } = await callbackServer.promptUser({
+      const server = new CallbackServer();
+      const { data } = await server.promptUser({
         initialData: {
-          data1: responses[0],
-          data2: responses[1],
-          data3: responses[2],
+          data1: responses[0].data,
+          data2: responses[1].data,
+          data3: responses[2].data,
         },
       });
 
