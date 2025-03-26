@@ -49,67 +49,42 @@ Magic Component Platform (MCP) is a powerful AI-driven tool that helps developer
 
 1. **Generate API Key**
 
-   - Visit your Magic dashboard
-   - Navigate to the API section
+   - Visit [21st.dev Magic Console](https://21st.dev/magic/console)
    - Generate a new API key
 
-2. **IDE Setup**
+2. **Choose Installation Method**
 
-#### Cursor IDE
+#### Method 1: CLI Installation (Recommended)
+
+One command to install and configure MCP for your IDE:
 
 ```bash
-npx -y @smithery/cli@latest run @21st-dev/magic-mcp --config "{\"TWENTY_FIRST_API_KEY\":\"your-api-key\"}"
+npx @21st-dev/cli@latest install <client> --api-key <key>
 ```
 
-#### Windsurf
+Supported clients: cursor, windsurf, cline, claude
 
-Add to `~/.codeium/windsurf/mcp_config.json`:
+#### Method 2: Manual Configuration
+
+If you prefer manual setup, add this to your IDE's MCP config file:
 
 ```json
 {
   "mcpServers": {
-    "magic": {
+    "@21st-dev/magic": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "install",
-        "@21st-dev/magic-mcp",
-        "--client",
-        "windsurf"
-      ],
-      "env": {
-        "TWENTY_FIRST_API_KEY": "your-api-key"
-      }
+      "args": ["-y", "@21st-dev/magic@latest", "API_KEY=\"your-api-key\""]
     }
   }
 }
 ```
 
-#### VSCode + Cline (Beta)
+Config file locations:
 
-Add to Cline's MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "magic": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "install",
-        "@21st-dev/magic-mcp",
-        "--client",
-        "cline"
-      ],
-      "env": {
-        "TWENTY_FIRST_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
+- Cursor: `~/.cursor/mcp.json`
+- Windsurf: `~/.codeium/windsurf/mcp_config.json`
+- Cline: `~/.cline/mcp_config.json`
+- Claude: `~/.claude/mcp_config.json`
 
 ## ❓ FAQ
 
