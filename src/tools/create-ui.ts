@@ -1,6 +1,8 @@
 import { z } from "zod";
-import { BaseTool } from "../utils/base-tool";
-import { twentyFirstClient } from "../utils/http-client";
+import { BaseTool } from "../utils/base-tool.js";
+import { twentyFirstClient } from "../utils/http-client.js";
+import { CallbackServer } from "../utils/callback-server.js";
+import open from "open";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -24,23 +26,67 @@ export class CreateUiTool extends BaseTool {
       .describe(
         "Generate a search query for 21st.dev (library for searching UI components) to find a UI component that matches the user's message. Must be a two-four words max or phrase"
       ),
+    absolutePathToCurrentFile: z
+      .string()
+      .describe(
+        "Absolute path to the current file to which we want to apply changes"
+      ),
+    absolutePathToProjectDirectory: z
+      .string()
+      .describe("Absolute path to the project root directory"),
   });
 
-  async execute({ message, searchQuery }: z.infer<typeof this.schema>) {
+  async execute({
+    message,
+    searchQuery,
+    absolutePathToCurrentFile,
+    absolutePathToProjectDirectory,
+  }: z.infer<typeof this.schema>): Promise<{
+    content: Array<{ type: "text"; text: string }>;
+  }> {
     try {
-      const { data } = await twentyFirstClient.post<CreateUiResponse>(
-        "/api/create-ui",
-        {
-          message,
-          searchQuery,
-        }
-      );
+      const response = await twentyFirstClient.post<{
+        data1: { text: string };
+        data2: { text: string };
+        data3: { text: string };
+      }>("/api/create-ui-variation", {
+        message,
+        searchQuery,
+        absolutePathToProjectDirectory,
+        absolutePathToCurrentFile,
+      });
+
+      if (response.status !== 200) {
+        open("https://21st.dev/settings/billing");
+        return {
+          content: [
+            {
+              type: "text" as const,
+              // @ts-ignore
+              text: response.data.text as string,
+            },
+          ],
+        };
+      }
+
+      const server = new CallbackServer();
+      const { data } = await server.promptUser({
+        initialData: {
+          data1: response.data.data1,
+          data2: response.data.data2,
+          data3: response.data.data3,
+        },
+      });
+
+      const componentData = data || {
+        text: "No component data received. Please try again.",
+      };
 
       return {
         content: [
           {
             type: "text" as const,
-            text: data.text,
+            text: JSON.stringify(componentData, null, 2),
           },
         ],
       };

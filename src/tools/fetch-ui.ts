@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { BaseTool } from "../utils/base-tool";
-import { twentyFirstClient } from "../utils/http-client";
+import { BaseTool } from "../utils/base-tool.js";
+import { twentyFirstClient } from "../utils/http-client.js";
 
 const FETCH_UI_TOOL_NAME = "21st_magic_component_inspiration";
 const FETCH_UI_TOOL_DESCRIPTION = `

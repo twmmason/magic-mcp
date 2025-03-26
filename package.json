@@ -1,22 +1,57 @@
 {
-  "name": "21stdev/magic-mcp",
-  "version": "1.0.0",
+  "name": "@21st-dev/magic",
+  "version": "0.0.28",
+  "type": "module",
+  "description": "Magic MCP UI builder by 21st.dev",
+  "homepage": "https://21st.dev/magic",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/21st-dev/magic-mcp.git"
+  },
+  "bin": {
+    "magic": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "UI",
+    "frontend",
+    "21st.dev",
+    "21",
+    "magic"
+  ],
   "main": "dist/index.js",
   "scripts": {
+    "build": "tsc && shx cp -r previewer dist/ && shx chmod +x dist/*.js",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "prepare": "npm run build",
+    "dev": "nodemon --watch src --ext ts,json --exec \"npm run build\"",
+    "publish-patch": "npm version patch && npm run build && npm publish --access public"
   },
   "author": "serafim@21st.dev",
   "license": "ISC",
-  "description": "Magic MCP",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.5.0",
-    "@types/axios": "^0.9.36",
-    "axios": "^1.7.9",
-    "typescript": "^5.7.3",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mcps-logger": "^1.0.0-rc.1",
+    "open": "^10.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/node": "^22.13.4"
+    "@types/axios": "^0.9.36",
+    "@types/node": "^22.13.4",
+    "nodemon": "^3.1.9",
+    "shx": "^0.3.4",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

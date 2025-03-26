@@ -1,15 +1,66 @@
-import axios from "axios";
+import { config } from "./config.js";
 
-const TWENTY_FIRST_API_KEY = process.env.TWENTY_FIRST_API_KEY || "test";
+const TWENTY_FIRST_API_KEY =
+  config.apiKey || process.env.TWENTY_FIRST_API_KEY || process.env.API_KEY;
 
-if (!TWENTY_FIRST_API_KEY) {
-  throw new Error("TWENTY_FIRST_API_KEY environment variable is not set");
+const BASE_URL = "https://magic.21st.dev";
+
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+interface HttpClient {
+  get<T>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
+  post<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
+  put<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
+  delete<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
+  patch<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
 }
 
-export const twentyFirstClient = axios.create({
-  baseURL: "https://magic.21st.dev",
-  headers: {
-    "x-api-key": TWENTY_FIRST_API_KEY,
-    "Content-Type": "application/json",
-  },
-});
+const createMethod = (method: HttpMethod) => {
+  return async <T>(
+    endpoint: string,
+    data?: unknown,
+    options: RequestInit = {}
+  ) => {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(TWENTY_FIRST_API_KEY ? { "x-api-key": TWENTY_FIRST_API_KEY } : {}),
+      ...options.headers,
+    };
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      method,
+      headers,
+      ...(data ? { body: JSON.stringify(data) } : {}),
+    });
+
+    return { status: response.status, data: (await response.json()) as T };
+  };
+};
+
+export const twentyFirstClient: HttpClient = {
+  get: createMethod("GET"),
+  post: createMethod("POST"),
+  put: createMethod("PUT"),
+  delete: createMethod("DELETE"),
+  patch: createMethod("PATCH"),
+};
