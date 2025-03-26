@@ -2,6 +2,9 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { initConsoleLogger } from "mcps-logger";
+initConsoleLogger();
+
 import { config } from "./utils/config.js";
 
 import { CreateUiTool } from "./tools/create-ui.js";
