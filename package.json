@@ -32,7 +32,7 @@
     "dev": "nodemon --watch src --ext ts,json --exec \"npm run build\"",
     "publish-patch": "npm version patch && npm run build && npm publish --access public"
   },
-  "author": "sergeibynas@gmail.com",
+  "author": "serafim@21st.dev",
   "license": "ISC",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.5.0",

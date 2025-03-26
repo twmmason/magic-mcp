@@ -9,8 +9,10 @@ import { config } from "./utils/config.js";
 
 import { CreateUiTool } from "./tools/create-ui.js";
 import { LogoSearchTool } from "./tools/logo-search.js";
+import { FetchUiTool } from "./tools/fetch-ui";
 
 const VERSION = "0.0.28";
+
 
 const server = new McpServer({
   name: "21st-magic",
@@ -20,6 +22,7 @@ const server = new McpServer({
 // Register tools
 new CreateUiTool().register(server);
 new LogoSearchTool().register(server);
+new FetchUiTool().register(server);
 
 async function runServer() {
   const transport = new StdioServerTransport();

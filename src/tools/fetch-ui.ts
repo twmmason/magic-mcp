@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
+import { twentyFirstClient } from "../utils/http-client.js";
 
 const FETCH_UI_TOOL_NAME = "21st_magic_component_inspiration";
 const FETCH_UI_TOOL_DESCRIPTION = `
@@ -7,9 +8,8 @@ const FETCH_UI_TOOL_DESCRIPTION = `
 After calling this tool, you must edit or add files to integrate the snippet into the codebase."
 `;
 
-interface Component {
-  icon: string;
-  code: string;
+interface FetchUiResponse {
+  text: string;
 }
 
 export class FetchUiTool extends BaseTool {
@@ -17,6 +17,7 @@ export class FetchUiTool extends BaseTool {
   description = FETCH_UI_TOOL_DESCRIPTION;
 
   schema = z.object({
+    message: z.string().describe("Full users message"),
     searchQuery: z
       .string()
       .describe(
@@ -24,15 +25,21 @@ export class FetchUiTool extends BaseTool {
       ),
   });
 
-  async execute({ searchQuery }: z.infer<typeof this.schema>) {
+  async execute({ message, searchQuery }: z.infer<typeof this.schema>) {
     try {
-      const components: Component[] = [];
+      const { data } = await twentyFirstClient.post<FetchUiResponse>(
+        "/api/fetch-ui",
+        {
+          message,
+          searchQuery,
+        }
+      );
 
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(components, null, 2),
+            text: data.text,
           },
         ],
       };
