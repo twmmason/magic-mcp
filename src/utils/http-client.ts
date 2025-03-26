@@ -8,27 +8,30 @@ const BASE_URL = "https://magic.21st.dev";
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 interface HttpClient {
-  get<T>(endpoint: string, options?: RequestInit): Promise<{ data: T }>;
+  get<T>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<{ status: number; data: T }>;
   post<T>(
     endpoint: string,
     data?: unknown,
     options?: RequestInit
-  ): Promise<{ data: T }>;
+  ): Promise<{ status: number; data: T }>;
   put<T>(
     endpoint: string,
     data?: unknown,
     options?: RequestInit
-  ): Promise<{ data: T }>;
+  ): Promise<{ status: number; data: T }>;
   delete<T>(
     endpoint: string,
     data?: unknown,
     options?: RequestInit
-  ): Promise<{ data: T }>;
+  ): Promise<{ status: number; data: T }>;
   patch<T>(
     endpoint: string,
     data?: unknown,
     options?: RequestInit
-  ): Promise<{ data: T }>;
+  ): Promise<{ status: number; data: T }>;
 }
 
 const createMethod = (method: HttpMethod) => {
@@ -50,11 +53,7 @@ const createMethod = (method: HttpMethod) => {
       ...(data ? { body: JSON.stringify(data) } : {}),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return { data: (await response.json()) as T };
+    return { status: response.status, data: (await response.json()) as T };
   };
 };
 

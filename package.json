@@ -1,6 +1,6 @@
 {
   "name": "@21st-dev/magic",
-  "version": "0.0.16",
+  "version": "0.0.28",
   "type": "module",
   "description": "Magic MCP UI builder by 21st.dev",
   "homepage": "https://21st.dev/magic",
@@ -26,7 +26,7 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && shx chmod +x dist/*.js",
+    "build": "tsc && shx cp -r previewer dist/ && shx chmod +x dist/*.js",
     "start": "node dist/index.js",
     "prepare": "npm run build",
     "dev": "nodemon --watch src --ext ts,json --exec \"npm run build\"",

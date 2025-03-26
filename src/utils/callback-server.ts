@@ -107,31 +107,32 @@ export class CallbackServer {
     this.config = config;
 
     try {
-      // Find available port and start server
       const availablePort = await this.findAvailablePort();
       this.server = this.app.listen(availablePort, "127.0.0.1");
 
-      this.server.on("error", (error) => {
-        if (this.promiseReject) this.promiseReject(error);
-      });
-
-      // Create and return promise
       return new Promise<CallbackResponse>((resolve, reject) => {
         this.promiseResolve = resolve;
         this.promiseReject = reject;
 
-        // Set timeout
+        if (!this.server) {
+          reject(new Error("Failed to start server"));
+          return;
+        }
+
+        this.server.on("error", (error) => {
+          if (this.promiseReject) this.promiseReject(error);
+        });
+
         this.timeoutId = setTimeout(() => {
           resolve({ data: { timedOut: true } });
           this.shutdown();
         }, timeout);
 
-        // Open browser
-        const address = this.server!.address() as AddressInfo;
-        const url = `http://127.0.0.1:${address.port}?id=${this.sessionId}`;
+        const url = `http://127.0.0.1:${availablePort}?id=${this.sessionId}`;
 
         open(url).catch((error) => {
-          reject(error);
+          console.warn("Failed to open browser:", error);
+          resolve({ data: { browserOpenFailed: true } });
           this.shutdown();
         });
       });

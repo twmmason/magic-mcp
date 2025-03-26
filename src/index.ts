@@ -2,11 +2,12 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { config } from "./utils/config.js";
 
 import { CreateUiTool } from "./tools/create-ui.js";
 import { LogoSearchTool } from "./tools/logo-search.js";
 
-const VERSION = "0.0.19";
+const VERSION = "0.0.28";
 
 const server = new McpServer({
   name: "21st-magic",

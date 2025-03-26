@@ -2,6 +2,7 @@ import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
 import { CallbackServer } from "../utils/callback-server.js";
+import open from "open";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -38,31 +39,42 @@ export class CreateUiTool extends BaseTool {
   async execute({
     message,
     searchQuery,
-    absolutePathToProjectDirectory,
     absolutePathToCurrentFile,
-  }: z.infer<typeof this.schema>) {
+    absolutePathToProjectDirectory,
+  }: z.infer<typeof this.schema>): Promise<{
+    content: Array<{ type: "text"; text: string }>;
+  }> {
     try {
-      const responses = await Promise.all([
-        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
-          message,
-          searchQuery,
-        }),
-        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
-          message,
-          searchQuery,
-        }),
-        twentyFirstClient.post<CreateUiResponse>("/api/create-ui-variation", {
-          message,
-          searchQuery,
-        }),
-      ]);
+      const response = await twentyFirstClient.post<{
+        data1: { text: string };
+        data2: { text: string };
+        data3: { text: string };
+      }>("/api/create-ui-variation", {
+        message,
+        searchQuery,
+        absolutePathToProjectDirectory,
+        absolutePathToCurrentFile,
+      });
+
+      if (response.status !== 200) {
+        open("https://21st.dev/settings/billing");
+        return {
+          content: [
+            {
+              type: "text" as const,
+              // @ts-ignore
+              text: response.data.text as string,
+            },
+          ],
+        };
+      }
 
       const server = new CallbackServer();
       const { data } = await server.promptUser({
         initialData: {
-          data1: responses[0].data,
-          data2: responses[1].data,
-          data3: responses[2].data,
+          data1: response.data.data1,
+          data2: response.data.data2,
+          data3: response.data.data3,
         },
       });
 
