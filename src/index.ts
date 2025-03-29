@@ -9,10 +9,9 @@ import { config } from "./utils/config.js";
 
 import { CreateUiTool } from "./tools/create-ui.js";
 import { LogoSearchTool } from "./tools/logo-search.js";
-import { FetchUiTool } from "./tools/fetch-ui";
+import { FetchUiTool } from "./tools/fetch-ui.js";
 
 const VERSION = "0.0.28";
-
 
 const server = new McpServer({
   name: "21st-magic",
