@@ -1,9 +1,10 @@
 import { config } from "./config.js";
+import fetch, { HeadersInit, RequestInit } from "node-fetch";
 
 const TWENTY_FIRST_API_KEY =
   config.apiKey || process.env.TWENTY_FIRST_API_KEY || process.env.API_KEY;
 
-const BASE_URL = "https://magic.21st.dev";
+export const BASE_URL = "https://magic.21st.dev"; // "http://localhost:3005";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
@@ -46,6 +47,8 @@ const createMethod = (method: HttpMethod) => {
       ...options.headers,
     };
 
+    console.log("BASE_URL", BASE_URL);
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
       method,
@@ -53,6 +56,7 @@ const createMethod = (method: HttpMethod) => {
       ...(data ? { body: JSON.stringify(data) } : {}),
     });
 
+    console.log("response", response);
     return { status: response.status, data: (await response.json()) as T };
   };
 };

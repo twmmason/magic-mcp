@@ -1,10 +1,10 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { Server } from "http";
-import { AddressInfo } from "net";
 import open from "open";
 import path from "path";
 import { fileURLToPath } from "url";
 import net from "net";
+import { twentyFirstClient } from "./http-client.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +56,49 @@ export class CallbackServer {
 
       res.json({ status: "success" });
     });
+
+    this.app.post<{ id: string }, any, { code: string; errorMessage: string }>(
+      "/fix-code-error/:id",
+      async (req, res): Promise<void> => {
+        const { id } = req.params;
+        const { code, errorMessage } = req.body;
+
+        if (id !== this.sessionId) {
+          res
+            .status(404)
+            .json({ status: "error", message: "Session not found" });
+          return;
+        }
+
+        if (!code || !errorMessage) {
+          res
+            .status(400)
+            .json({ status: "error", message: "Missing code or errorMessage" });
+          return;
+        }
+
+        try {
+          const response = await twentyFirstClient.post<{ fixedCode: string }>(
+            "/api/fix-code-error",
+            { code, errorMessage }
+          );
+
+          if (response.status === 200) {
+            res.json({ status: "success", data: response.data });
+          } else {
+            res
+              .status(response.status)
+              .json({ status: "error", message: response.data || "API Error" });
+          }
+        } catch (error: any) {
+          console.error("Error proxying /fix-code-error:", error);
+          res.status(500).json({
+            status: "error",
+            message: error.message || "Internal Server Error",
+          });
+        }
+      }
+    );
 
     this.app.get("*", (req, res) => {
       res.sendFile(path.join(previewerPath, "index.html"));
