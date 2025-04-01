@@ -12,8 +12,7 @@ import { FetchUiTool } from "./tools/fetch-ui.js";
 
 setupJsonConsole();
 
-const VERSION = "0.0.30";
-console.log("NEW SERVER");
+const VERSION = "0.0.33";
 const server = new McpServer({
   name: "21st-magic",
   version: VERSION,
