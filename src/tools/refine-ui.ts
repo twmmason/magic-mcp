@@ -19,9 +19,9 @@ export class RefineUiTool extends BaseTool {
 
   schema = z.object({
     userMessage: z.string().describe("Full user's message about UI refinement"),
-    pathOfActiveFile: z
+    absolutePathToRefiningFile: z
       .string()
-      .describe("Path to the file containing the UI component to refine"),
+      .describe("Absolute path to the file that needs to be refined"),
     context: z
       .string()
       .describe(
@@ -31,15 +31,15 @@ export class RefineUiTool extends BaseTool {
 
   async execute({
     userMessage,
-    pathOfActiveFile,
+    absolutePathToRefiningFile,
     context,
   }: z.infer<typeof this.schema>) {
     try {
       const { data } = await twentyFirstClient.post<RefineUiResponse>(
-        "/api/refine_ui",
+        "/api/refine-ui",
         {
           userMessage,
-          fileContent: await this.getContentOfFile(pathOfActiveFile),
+          fileContent: await this.getContentOfFile(absolutePathToRefiningFile),
           context,
         }
       );
