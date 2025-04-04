@@ -13,7 +13,7 @@ import { RefineUiTool } from "./tools/refine-ui.js";
 
 setupJsonConsole();
 
-const VERSION = "0.0.33";
+const VERSION = "0.0.34";
 const server = new McpServer({
   name: "21st-magic",
   version: VERSION,

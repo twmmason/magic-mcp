@@ -6,6 +6,7 @@ const TWENTY_FIRST_API_KEY =
 
 export const BASE_URL = "https://magic.21st.dev"; // "http://localhost:3005"; //
 
+
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 interface HttpClient {
