@@ -9,10 +9,11 @@ import { setupJsonConsole } from "./utils/console.js";
 import { CreateUiTool } from "./tools/create-ui.js";
 import { LogoSearchTool } from "./tools/logo-search.js";
 import { FetchUiTool } from "./tools/fetch-ui.js";
+import { RefineUiTool } from "./tools/refine-ui.js";
 
 setupJsonConsole();
 
-const VERSION = "0.0.34";
+const VERSION = "0.0.35";
 const server = new McpServer({
   name: "21st-magic",
   version: VERSION,
@@ -22,6 +23,7 @@ const server = new McpServer({
 new CreateUiTool().register(server);
 new LogoSearchTool().register(server);
 new FetchUiTool().register(server);
+new RefineUiTool().register(server);
 
 async function runServer() {
   const transport = new StdioServerTransport();
