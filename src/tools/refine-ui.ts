@@ -4,9 +4,9 @@ import { twentyFirstClient } from "../utils/http-client.js";
 
 const REFINE_UI_TOOL_NAME = "21st_magic_component_refiner";
 const REFINE_UI_TOOL_DESCRIPTION = `
-"Use this tool when the user requests to refine/improve current UI component with /ui or /21 commands, 
+"Use this tool when the user requests to re-design/refine/improve current UI component with /ui or /21 commands, 
 or when context is about improving, or refining UI for a React component or molecule (NOT for big pages).
-This tool improves UI of components and returns improved version of the component and instructions on how to implement it."
+This tool improves UI of components and returns redesigned version of the component and instructions on how to implement it."
 `;
 
 interface RefineUiResponse {

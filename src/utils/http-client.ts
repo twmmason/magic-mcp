@@ -4,8 +4,10 @@ import fetch, { HeadersInit, RequestInit } from "node-fetch";
 const TWENTY_FIRST_API_KEY =
   config.apiKey || process.env.TWENTY_FIRST_API_KEY || process.env.API_KEY;
 
-export const BASE_URL = "https://magic.21st.dev"; // "http://localhost:3005"; //
-
+const isTesting = false;
+export const BASE_URL = isTesting
+  ? "http://localhost:3005"
+  : "https://magic.21st.dev";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
