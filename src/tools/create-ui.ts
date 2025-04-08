@@ -3,6 +3,7 @@ import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
 import { CallbackServer } from "../utils/callback-server.js";
 import open from "open";
+import { getContentOfFile } from "../utils/get-content-of-file.js";
 
 const UI_TOOL_NAME = "21st_magic_component_builder";
 const UI_TOOL_DESCRIPTION = `
@@ -34,13 +35,18 @@ export class CreateUiTool extends BaseTool {
     absolutePathToProjectDirectory: z
       .string()
       .describe("Absolute path to the project root directory"),
+    context: z
+      .string()
+      .describe(
+        "Extract additional context about what should be done to create a ui component/page based on the user's message, search query, and conversation history, files. Don't halucinate and be on point."
+      ),
   });
 
   async execute({
     message,
     searchQuery,
     absolutePathToCurrentFile,
-    absolutePathToProjectDirectory,
+    context,
   }: z.infer<typeof this.schema>): Promise<{
     content: Array<{ type: "text"; text: string }>;
   }> {
@@ -52,8 +58,8 @@ export class CreateUiTool extends BaseTool {
       }>("/api/create-ui-variation", {
         message,
         searchQuery,
-        absolutePathToProjectDirectory,
-        absolutePathToCurrentFile,
+        fileContent: await getContentOfFile(absolutePathToCurrentFile),
+        context,
       });
 
       if (response.status !== 200) {
@@ -82,11 +88,22 @@ export class CreateUiTool extends BaseTool {
         text: "No component data received. Please try again.",
       };
 
+      const responseToUser = `
+${"```tsx"}      
+${componentData.code}
+${"```"}      
+
+You're provided with a code snippet for a UI component. Your task is to integrate it into user's codebase.
+Don't change the code of this component, just add it, integrate it, make sure that you add all imports, if you have missing ui components from this code -imports use shadcn/ui.
+
+
+      `;
+
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(componentData, null, 2),
+            text: responseToUser,
           },
         ],
       };
