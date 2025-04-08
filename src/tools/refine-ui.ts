@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BaseTool } from "../utils/base-tool.js";
 import { twentyFirstClient } from "../utils/http-client.js";
+import { getContentOfFile } from "../utils/get-content-of-file.js";
 
 const REFINE_UI_TOOL_NAME = "21st_magic_component_refiner";
 const REFINE_UI_TOOL_DESCRIPTION = `
@@ -39,7 +40,7 @@ export class RefineUiTool extends BaseTool {
         "/api/refine-ui",
         {
           userMessage,
-          fileContent: await this.getContentOfFile(absolutePathToRefiningFile),
+          fileContent: await getContentOfFile(absolutePathToRefiningFile),
           context,
         }
       );
@@ -55,16 +56,6 @@ export class RefineUiTool extends BaseTool {
     } catch (error) {
       console.error("Error executing tool", error);
       throw error;
-    }
-  }
-
-  private async getContentOfFile(path: string): Promise<string> {
-    try {
-      const fs = await import("fs/promises");
-      return await fs.readFile(path, "utf-8");
-    } catch (error) {
-      console.error(`Error reading file ${path}:`, error);
-      return "";
     }
   }
 }
