@@ -1,5 +1,4 @@
 import { config } from "./config.js";
-import fetch, { HeadersInit, RequestInit } from "node-fetch";
 
 const TWENTY_FIRST_API_KEY =
   config.apiKey || process.env.TWENTY_FIRST_API_KEY || process.env.API_KEY;
