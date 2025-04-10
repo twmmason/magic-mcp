@@ -93,8 +93,38 @@ ${"```tsx"}
 ${componentData.code}
 ${"```"}      
 
+
 You're provided with a code snippet for a UI component. Your task is to integrate it into user's codebase.
-Don't change the code of this component, just add it, integrate it, make sure that you add all imports, if you have missing ui components from this code -imports use shadcn/ui.
+Don't change the code of this component, just add it, integrate it, make sure that you add all imports, if you have missing ui components from this code -use shadcn/ui for imports.
+
+
+### Styling instructions
+Check your globals.css and tailwind.config.js for brand color variables
+Replace hardcoded colors with your brand color variables where appropriate
+Example: replace 'bg-blue-500' with 'bg-brand' if you have brand colors defined
+
+## Integration instructions
+Make sure all required dependencies are installed
+Check component's TypeScript types match your project's conventions
+Verify all imported components and utilities exist in your project
+
+## Shadcn/ui instructions
+After you add the component, make sure to add the component to the project. If you can't resolve components from demo code,
+Make sure to install shadcn/ui components from the demo code missing imports
+
+Examples of importing shadcn/ui components:
+if these imports can't be resolved:
+${"```tsx"}
+import {
+  Table
+} from "@/components/ui/table"
+import { Textarea } from "@/components/ui/textarea"
+${"```"}
+
+then run this command:
+${"```bash"}
+npx shadcn@latest add table textarea
+${"```"}
 
 
       `;
