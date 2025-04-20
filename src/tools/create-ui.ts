@@ -75,6 +75,17 @@ export class CreateUiTool extends BaseTool {
         };
       }
 
+      // NEW: Respect MCP_PREVIEWER env flag to disable interactive preview
+      const disablePreviewer = process.env.MCP_PREVIEWER === "off";
+      let componentData: { text?: string; code?: string } = { text: "", code: "" };
+
+      if (disablePreviewer) {
+        // Automatically pick the first variant (data1) when previewer is disabled
+        componentData = response.data.data1 ?? {
+          text: "No component data received. Please try again.",
+        };
+      } else {
+        // Existing interactive flow
       const server = new CallbackServer();
       const { data } = await server.promptUser({
         initialData: {
@@ -83,14 +94,16 @@ export class CreateUiTool extends BaseTool {
           data3: response.data.data3,
         },
       });
-
-      const componentData = data || {
+        componentData = data || {
         text: "No component data received. Please try again.",
       };
+      }
+
+      const snippet = (componentData.code || componentData.text || "/* No code snippet provided */");
 
       const responseToUser = `
 ${"```tsx"}      
-${componentData.code}
+${snippet}
 ${"```"}      
 
 
