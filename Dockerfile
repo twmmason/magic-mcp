@@ -5,11 +5,11 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json ./
 
+# Copy application code first
+COPY . .
+
 # Install pnpm and dependencies
 RUN npm install
-
-# Copy application code
-COPY . .
 
 # Build TypeScript
 RUN npm run build
